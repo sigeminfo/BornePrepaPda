@@ -1,0 +1,98 @@
+/* Table Stock Théorique */
+[idname="stockTheorique"] > div {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.pulseD {
+    animation: pulseD 0.5s forwards ease-out;
+    box-shadow: 0px 15px 20px -11px rgba(11, 72, 157, 0.9);
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+@-webkit-keyframes pulseD {
+    0% {
+      -webkit-box-shadow: 0 0 0 0 rgba(11, 72, 157, 0.4);
+    }
+    70% {
+      -webkit-box-shadow: 0 0 0 10px rgba(11, 72, 157, 0);
+    }
+    100% {
+      -webkit-box-shadow: 0 0 0 0 rgba(11, 72, 157, 0);
+    }
+}
+@keyframes pulseD {
+    0% {
+      -moz-box-shadow: 0 0 0 0 rgba(11, 72, 157, 0.4);
+      box-shadow: 0 0 0 0 rgba(11, 72, 157, 0.4);
+    }
+    70% {
+      -moz-box-shadow: 0 0 0 10px rgba(11, 72, 157, 0);
+      box-shadow: 0 0 0 10px rgba(11, 72, 157, 0);
+    }
+    100% {
+      -moz-box-shadow: 0 0 0 0 rgba(11, 72, 157, 0);
+      box-shadow: 0 0 0 0 rgba(11, 72, 157, 0);
+    }
+}
+
+.pulseL {
+    animation: pulseL 0.5s forwards ease-out;
+    box-shadow: 0px 15px 20px -11px rgba(53, 211, 210, 0.9);
+}
+
+@-webkit-keyframes pulseL {
+    0% {
+      -webkit-box-shadow: 0 0 0 0 rgba(53, 211, 210, 0.4);
+    }
+    70% {
+      -webkit-box-shadow: 0 0 0 10px rgba(53, 211, 210, 0);
+    }
+    100% {
+      -webkit-box-shadow: 0 0 0 0 rgba(53, 211, 210, 0);
+    }
+}
+@keyframes pulseL {
+    0% {
+      -moz-box-shadow: 0 0 0 0 rgba(53, 211, 210, 0.4);
+      box-shadow: 0 0 0 0 rgba(53, 211, 210, 0.4);
+    }
+    70% {
+      -moz-box-shadow: 0 0 0 10px rgba(53, 211, 210, 0);
+      box-shadow: 0 0 0 10px rgba(53, 211, 210, 0);
+    }
+    100% {
+      -moz-box-shadow: 0 0 0 0 rgba(53, 211, 210, 0);
+      box-shadow: 0 0 0 0 rgba(53, 211, 210, 0);
+    }
+}
+
+#entete {
+  transition: transform 0.3s ease-in-out;
+  transform: translateY(-9.75rem);
+}
+#toggleEntete {
+  cursor: pointer;
+  cursor: pointer;
+  position: relative;
+}
+#toggleEntete svg {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease-in-out;
+}
+
+#entete sg-input > div {
+  flex-direction:row !important;
+  align-items:center;
+}
+#entete sg-input > div label {
+  width:120px;
+}

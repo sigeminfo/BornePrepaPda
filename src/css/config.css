@@ -1,0 +1,56 @@
+@charset "ISO-8859-1";
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body{
+  width:100%;
+  min-height:100vh;
+  font-family: theme('fontFamily.corps');
+  font-optical-sizing: auto;
+}
+
+#app {
+  background: url('../../public/img/background.png');
+  background-size:cover;
+  background-repeat: no-repeat;
+  height:100vh;
+  /*padding:20px 40px;*/
+  scrollbar-width: none !important;
+  -ms-overflow-style: none;
+}
+div {
+  scrollbar-width: none !important;
+}
+
+#app ::-webkit-scrollbar {
+  display:none;
+}
+
+/* Config Éléments */
+input:focus, select:focus {
+  box-shadow: 0 0 0 0.25rem theme('colors.lblueLight') !important;
+  outline: 0 !important;
+}
+
+select {
+  background: url('../../public/img/icons/select.svg') rgba(255,255,255,0.15) !important;
+  background-position:95% center !important;
+  background-repeat: no-repeat !important;
+  background-size:20px !important;
+}
+
+.disabled {
+  background-color:#EFEFEF;
+  pointer-events: none;
+}
+.selected {
+  background-color: theme('colors.lblueLight');
+}
+
+/* COMPONENTS */
+
+/*table*/
+

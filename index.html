@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8"/>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Module Fabrication</title>
+    <link rel="stylesheet" href="./src/css/config.css">
+    <link rel="stylesheet" href="./src/css/style.css">
+    
+    <script type="module" src="./src/pages/home.js"></script>
+    <script type="module" src="./src/router.js"></script>
+
+
+    <!-- JQUERY CONFIRM -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.4/jquery-confirm.min.css">
+
+  </head>
+
+  <body>
+    <div class='' id="app">
+
+    </div>
+
+    <div id='modalAlert' class='z-[100] hidden fixed top-0 left-0 w-screen h-screen justify-center items-center'>
+      <div id='modalAlertContent' class='bg-white rounded-md p-6 shadow-2xl flex flex-col items-center justify-center'>
+      </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.4/jquery-confirm.min.js"></script>
+  </body>
+
+</html>
