@@ -46,8 +46,17 @@ export default class Table extends CustomElement {
             tr.className = `even:bg-dblueLight odd:bg-white hover:bg-dblueLightHover ${row.css ? row.css : ''}`;
             tr.dataset.id = row.id || "";
 
-            if (trAttr && Object.keys(trAttr).length > 0) {
-                tr.setAttribute(trAttr.lib, trAttr.value);
+            if (trAttr && typeof trAttr === 'object') {
+                Object.keys(trAttr).forEach(attrName => {
+                    if (attrName.startsWith('data-')) {
+                        // For data attributes, use dataset
+                        const dataKey = attrName.replace('data-', '');
+                        tr.dataset[dataKey] = trAttr[attrName];
+                    } else {
+                        // For regular attributes
+                        tr.setAttribute(attrName, trAttr[attrName]);
+                    }
+                });
             }
 
             tr.dataset.trData = trData;
@@ -58,6 +67,11 @@ export default class Table extends CustomElement {
                 let tdCss = cell.css || '';
                 tdCss = tdCss.includes('number') ? tdCss.replace('number', 'text-right') : tdCss;
                 td.className = `px-3.5 py-2 ${tdCss}`;
+                if (cell.attr && typeof cell.attr === 'object') {
+                    Object.keys(cell.attr).forEach(attrName => {
+                        td.setAttribute(attrName, cell.attr[attrName]);
+                    });
+                }
                 tr.appendChild(td);
             });
             tbody.appendChild(tr);

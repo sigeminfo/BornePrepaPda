@@ -58,6 +58,25 @@ export class HomePage extends HTMLElement {
         }
     }
 
+    handleTableClick(event) {
+        const td = event.target.closest('td');
+        if (!td) return;
+        const tr = td.parentElement;
+        //console.log(tr);
+        if (!tr) return;
+
+        const facNbl = tr.getAttribute('data-id');
+        //console.log(facNbl);
+        if (facNbl) {
+            const client = tr.querySelector('.client').textContent;
+            const date = document.getElementById('dateFiltre').value;
+            sessionStorage.setItem('nbl', facNbl);
+            sessionStorage.setItem('client', client);
+            sessionStorage.setItem('date', date);
+            window.location.hash = '/lignes?nbl=' + facNbl;
+        }
+    }
+
     async getFac() {
         try {
             const date = document.getElementById('dateFiltre').value;
@@ -66,8 +85,10 @@ export class HomePage extends HTMLElement {
             const tou = (document.getElementById('touFiltre').value? document.getElementById('touFiltre').value : "");
             const com = (document.getElementById('comFiltre').value? document.getElementById('comFiltre').value : "");
             this.fac = await this.globalModel.getFac(date, cli, art, tou, com);
-            console.log(this.fac);
+            //console.log(this.fac);
             this.querySelector('[idname="tableCmd"]').setAttribute('data', JSON.stringify(this.formatTable(this.fac)));
+           
+            document.getElementById('tableCmd').addEventListener('click', this.handleTableClick.bind(this));
         } catch (error) {
             console.error('Erreur lors de la récupération des données :', error);
         }
@@ -106,7 +127,7 @@ export class HomePage extends HTMLElement {
     render() {
         this.innerHTML = `
             <main id='main' role='main' class='h-full flex flex-col relative'>
-                <div id='entete' class='flex flex-col items-center w-full absolute top-0 left-0 right-0 z-10'>
+                <div id='entete' class='flex flex-col items-center w-full absolute top-0 left-0 right-0 z-10 -translate-y-[9.75rem]'>
                     <div class='bg-white shadow p-3 w-full flex flex-col gap-3'>
                         <div class='flex justify-between'>
                             <sg-input idname='cliFiltre' label='Client' placeholder='Nom du client' input='text' inputCss='grow' class='w-[45%]'></sg-input>

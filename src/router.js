@@ -1,6 +1,6 @@
 "use strict";
-// Fonction pour mettre à jour le composant en fonction de la route
-function loadComponent(route) {
+
+function loadComponent(route, params) {
     const app = document.getElementById('app');
     if (app) {
         // Nettoyer le contenu précédent
@@ -10,18 +10,30 @@ function loadComponent(route) {
             case "/":
                 app.appendChild(document.createElement('home-page'));
                 break;
+            case "/lignes":
+                const lignesPage = document.createElement('lignes-page');
+                if (params) {
+                    const facNbl = params.split('=')[1];
+                    lignesPage.setAttribute('data-params', facNbl);
+                }
+                app.appendChild(lignesPage);
+                break;
             default:
                 app.appendChild(document.createElement('home-page'));
                 break;
         }
     }
 }
+
 // Fonction pour gérer les routes avec hash
 function router() {
-    let hash = window.location.hash.slice(1);
-    if (hash === "")
-        hash = "/"; // Rediriger vers la page d'accueil par défaut
-    loadComponent(hash);
+    const hash = window.location.hash.slice(1);
+    let pathNoParams = hash.split('?')[0];
+    const params = hash.split('?')[1];
+    if (pathNoParams === "")
+        pathNoParams = "/"; // Rediriger vers la page d'accueil par défaut
+
+    loadComponent(pathNoParams, params);
 }
 // Écouter les changements dans l'URL du hash
 window.addEventListener("hashchange", router);
