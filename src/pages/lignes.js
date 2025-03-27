@@ -45,6 +45,11 @@ export class LignesPage extends HTMLElement {
 
     setupEventListeners() {
         document.getElementById('toggleEntete').addEventListener('click', this.toggleEntete.bind(this));
+
+        document.getElementById('clodeModal').addEventListener('click', () => {
+            document.getElementById('modal').classList.add('hidden');
+            document.getElementById('modalContent').innerHTML = '';
+        });
     }
 
     toggleEntete() {
@@ -236,31 +241,65 @@ export class LignesPage extends HTMLElement {
     }
 
     pesee(detail) {
+        console.log(detail);
         document.getElementById('modal').classList.remove('hidden');
         document.getElementById('modalContent').innerHTML = '';
-            let html = `
-                <div class='flex flex-col gap-3'>
-                    <div class='flex w-[45%] items-end'>
-                        <sg-input idname='colis' label='Colis' input='text' inputCss='!rounded-l-md !h-14' class='grow'></sg-input>
-                        <sg-btn idname='moinsCol' css='bg-dblueBase text-white rounded-r-md w-14 !h-14 flex items-center justify-center'>-</sg-btn>
-                    </div>
-
-                    <div class='flex w-full gap-6'>
-                        <sg-input idname='tare' label='Tare' input='number' inputCss='!h-14 rounded-md' class='w-[45%]'></sg-input>
-                        <sg-input idname='tarep' label='Tare Palette' input='number' inputCss='!h-14 rounded-md' class='w-[45%]'></sg-input>
-                    </div>
-
-                    <div class='flex w-full gap-6'>
-                        <sg-input idname='poidsbrut' label='Poids Brut' input='number' inputCss='!h-14 rounded-md' class='w-[45%]'></sg-input>
-                        <sg-input idname='poidsnet' label='Poids Net' input='number' inputCss='!h-14 rounded-md' class='w-[45%]'></sg-input>
-                    </div>
-
-                    <div class='flex w-full gap-6'>
-                        <sg-btn idname='validPesee' css='bg-dblueBase text-white rounded-md w-full !h-14' class='w-[45%]'>Valider</sg-btn>
-                        <sg-btn idname='remiseDefaut' css='bg-white border border-dblueBase text-dblueBase rounded-md w-full !h-14' class='w-[45%]'>Remise par défaut</sg-btn>
+        const html = `
+            <div class='flex flex-col gap-3'>
+                <div class='flex w-[45%] items-end'>
+                    <sg-input idname='colis' label='Colis' input='text' inputCss='!rounded-l-md !h-14 px-4' class='grow' value=${detail.Lf_col}></sg-input>
+                    <sg-btn idname='moinsCol' css='bg-dblueBase text-white rounded-r-md w-14 !h-14 flex items-center justify-center'>-</sg-btn>
                 </div>
-            `;
-            document.getElementById('modalContent').innerHTML = html;
+
+                <div class='flex w-full gap-6'>
+                    <sg-input idname='tare' label='Tare' input='number' inputCss='!h-14 rounded-md px-4' class='w-[45%]' value=${detail.Lf_tar}></sg-input>
+                    <sg-input idname='tarep' label='Tare Palette' input='number' inputCss='!h-14 rounded-md px-4' class='w-[45%]' value=${detail.Lf_tarp}></sg-input>
+                </div>
+
+                <div class='flex w-full gap-6'>
+                    <sg-input idname='poidsbrut' label='Poids Brut' input='number' inputCss='!h-14 rounded-md px-4' class='w-[45%]' value=${detail.Lf_poib}></sg-input>
+                    <sg-input idname='poidsnet' label='Poids Net' input='number' inputCss='!h-14 rounded-md px-4' class='w-[45%]' value=${detail.Lf_poin}></sg-input>
+                </div>
+
+                <div class='flex w-full gap-6'>
+                    <sg-btn idname='validPesee' css='bg-dblueBase text-white rounded-md w-full !h-14 text-xl font-semibold' class='w-[45%]'>Valider</sg-btn>
+                    <sg-btn idname='remiseDefaut' css='bg-white border border-dblueBase text-dblueBase rounded-md w-full !h-14 text-xl font-semibold' class='w-[45%]'>Remise par défaut</sg-btn>
+            </div>
+        `;
+        document.getElementById('modalContent').innerHTML = html;
+
+        document.getElementById('validPesee').addEventListener('click', () => {
+            this.updateFacLig(detail);
+        });
+        document.getElementById('remiseDefaut').addEventListener('click', () => {
+            this.pesee(detail);
+        });
+    }
+
+    updateFacLig(detail) {
+        const colis = document.getElementById('colis').value;
+        const tare = document.getElementById('tare').value;
+        const tarep = document.getElementById('tarep').value;
+        const poidsbrut = document.getElementById('poidsbrut').value;
+        const poidsnet = document.getElementById('poidsnet').value;
+
+        detail.Lf_col = colis;
+        detail.Lf_tar = tare;
+        detail.Lf_tarp = tarep;
+        detail.Lf_poib = poidsbrut;
+        detail.Lf_poin = poidsnet;
+        detail.Lf_tagc = sessionStorage.getItem('client');
+
+        this.globalModel.updFacLig(detail)
+            .then(response => {
+                console.log("Success :", response);
+                document.getElementById('modal').classList.add('hidden');
+                document.getElementById('modalContent').innerHTML = '';
+                this.loadLignesData(this.facNbl);
+            })
+            .catch(error => {
+                console.error("Error updating line:", error);
+            });
     }
 
     render() {
