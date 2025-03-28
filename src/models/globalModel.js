@@ -247,11 +247,12 @@ export class Global {
             const data = {
                 "request": {
                     "IOjson": {
-                        "IOfacNbl": facNbl,
-                        "IOlfLig": lfLig
+                        "IOfacNbl": `${facNbl}`,
+                        "IOlfLig": `${lfLig}`
                     }
                 }
             };
+            console.log(data);
             const resp = await this.apiService.put(`${this.apiServiceSuffix}/getIntStk`, data );
             if (!resp?.response) {
                 throw new Error('Réponse invalide');
@@ -291,8 +292,8 @@ export class Global {
             const data = {
                 "request": {
                     "IOjson": {
-                        "IOfacNbl": facNbl,
-                        "IOlfLig": lfLig
+                        "IOfacNbl": `${facNbl}`,
+                        "IOlfLig": `${lfLig}`
                     }
                 }
             };
