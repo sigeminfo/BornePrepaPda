@@ -26,3 +26,21 @@ export function lessColis() {
         }
     }
 }
+
+export function lessDate() {
+    const dateInput = document.getElementById('dateFiltre');
+    if (dateInput && dateInput.value) {
+        const currentDate = new Date(dateInput.value);
+        currentDate.setDate(currentDate.getDate() - 1);
+        dateInput.value = currentDate.toISOString().split('T')[0];
+    }
+}
+
+export function moreDate() {
+    const dateInput = document.getElementById('dateFiltre');
+    if (dateInput && dateInput.value) {
+        const currentDate = new Date(dateInput.value);
+        currentDate.setDate(currentDate.getDate() + 1);
+        dateInput.value = currentDate.toISOString().split('T')[0];
+    }
+}

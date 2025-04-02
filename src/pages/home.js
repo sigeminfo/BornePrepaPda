@@ -3,6 +3,7 @@ import '../components/Btn.js';
 import '../components/Input.js';
 import '../components/InputDouble.js';
 import '../components/Select.js';
+import { lessDate, moreDate } from '../utils/lib.js';
 
 import { Global } from '../models/globalModel.js';
 
@@ -40,6 +41,8 @@ export class HomePage extends HTMLElement {
     setupEventListeners() {
         document.getElementById('toggleEntete').addEventListener('click', this.toggleEntete.bind(this));
         document.getElementById('btnFiltre').addEventListener('click', this.getFac.bind(this));
+        document.getElementById('lessDateBtn').addEventListener('click', lessDate);
+        document.getElementById('moreDateBtn').addEventListener('click', moreDate);
     }
 
     toggleEntete() {
@@ -136,7 +139,10 @@ export class HomePage extends HTMLElement {
                         <div class='flex justify-between'>
                             <div class='flex justify-between gap-3 w-[45%]'>
                                 <sg-input idname='dateFiltre' label='Date' input='date' inputCss='grow'></sg-input>
-                                <div class='bg-dblueBase rounded text-white flex items-center'><button class='w-12' onclick='lessDate()'>-</button><button class='w-12' onclick='moreDate()'>+</button></div>
+                                <div class='bg-dblueBase rounded text-white flex items-center'>
+                                    <button class='w-12' id="lessDateBtn">-</button>
+                                    <button class='w-12' id="moreDateBtn">+</button>
+                                </div>
                             </div>
                             <sg-input idname='touFiltre' label='Tournée' input='text' inputCss='grow' class='w-[45%]'></sg-input>
                         </div>

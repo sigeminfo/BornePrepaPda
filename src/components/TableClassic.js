@@ -51,15 +51,17 @@ export default class Table extends CustomElement {
                     if (attrName.startsWith('data-')) {
                         // For data attributes, use dataset
                         const dataKey = attrName.replace('data-', '');
-                        tr.dataset[dataKey] = trAttr[attrName];
+                        const value = typeof trAttr[attrName] === 'object' ? JSON.stringify(trAttr[attrName]) : trAttr[attrName];
+                        tr.dataset[dataKey] = value;
                     } else {
                         // For regular attributes
-                        tr.setAttribute(attrName, trAttr[attrName]);
+                        const value = typeof trAttr[attrName] === 'object' ? JSON.stringify(trAttr[attrName]) : trAttr[attrName];
+                        tr.setAttribute(attrName, value);
                     }
                 });
             }
 
-            tr.dataset.trData = trData;
+            tr.dataset.trData = typeof trData === 'object' ? JSON.stringify(trData) : trData;
             // Les cellules
             row.trData && row.trData.forEach(cell => {
                 const td = document.createElement('td');

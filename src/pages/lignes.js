@@ -73,7 +73,7 @@ export class LignesPage extends HTMLElement {
 
     async loadLignesData(facNbl) {
         try {
-            //console.log(facNbl);
+            console.log(facNbl);
             this.lignes = await this.globalModel.getFacLig(facNbl);
 
             if (this.lignes && this.lignes.length > 0) {
@@ -92,6 +92,21 @@ export class LignesPage extends HTMLElement {
                             if (row.dataset.ligne) {
                                 const ligne = JSON.parse(row.dataset.ligne);
                                 this.handleConfirmRow(ligne);
+                            }
+                        });
+                    });
+
+                    // Ajout de l'event aux boutons "manquant"
+                    const manquantButtons = tableElement.querySelectorAll('.manquant');
+                    
+                    manquantButtons.forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation(); // Prevent row click event
+                            const row = btn.closest('tr');
+                            if (row && row.dataset.ligne) {
+                                const ligne = JSON.parse(row.dataset.ligne);
+                                const isManquant = btn.parentElement.dataset.manquant;
+                                (isManquant == 'true' ? this.setManquant(ligne.Fac_nbl, ligne.Lf_lig, true) : this.setManquant(ligne.Fac_nbl, ligne.Lf_lig));
                             }
                         });
                     });
@@ -117,34 +132,53 @@ export class LignesPage extends HTMLElement {
 
         let btnsStateB = document.createElement('div');
         let btnsStateO = document.createElement('div');
+        btnsStateO.dataset.manquant = true;
         let btnsStateNull = document.createElement('div');
+        
         btnsStateO.className = 'flex items-center gap-1.5';
         btnsStateB.className = 'flex items-center gap-1.5';
         btnsStateNull.className = 'flex items-center gap-1.5';
 
-        let btnImp = document.createElement('button');
-        btnImp.className = 'imp bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
-        btnImp.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer-icon lucide-printer"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>';
-        let btnConfirm = document.createElement('button');
-        btnConfirm.className = 'confirm bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
-        btnConfirm.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-icon lucide-check"><path d="M20 6 9 17l-5-5"/></svg>';
-        let btnManquant = document.createElement('button');
-        btnManquant.className = 'manquant bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
-        btnManquant.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-triangle-alert-icon lucide-triangle-alert"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
-        let btnSuppr = document.createElement('button');
-        btnSuppr.className = 'suppr bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
-        btnSuppr.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2-icon lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>';
+        let btnImpNull = document.createElement('button');
+        let btnImpB = document.createElement('button');
+        btnImpNull.className = 'imp bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
+        btnImpNull.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer-icon lucide-printer"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>';
+        btnImpB.className = 'imp bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
+        btnImpB.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer-icon lucide-printer"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>';
+        
+        let btnConfirmNull = document.createElement('button');
+        let btnConfirmB = document.createElement('button');
+        btnConfirmNull.className = 'confirm bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
+        btnConfirmNull.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-icon lucide-check"><path d="M20 6 9 17l-5-5"/></svg>';
+        btnConfirmB.className = 'confirm bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
+        btnConfirmB.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-icon lucide-check"><path d="M20 6 9 17l-5-5"/></svg>';
+        
+        let btnManquantO = document.createElement('button');
+        let btnManquantNull = document.createElement('button');
+        btnManquantO.className = 'manquant bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
+        btnManquantO.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-triangle-alert-icon lucide-triangle-alert"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
+        btnManquantNull.className = 'manquant bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
+        btnManquantNull.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-triangle-alert-icon lucide-triangle-alert"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
+        
+        let btnSupprB = document.createElement('button');
+        let btnSupprNull = document.createElement('button');
+        btnSupprB.className = 'suppr bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
+        btnSupprB.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2-icon lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>';
+        btnSupprNull.className = 'suppr bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
+        btnSupprNull.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2-icon lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>';
 
-        btnsStateB.appendChild(btnConfirm);
-        btnsStateB.appendChild(btnImp);
-        btnsStateB.appendChild(btnSuppr);
+        btnsStateB.appendChild(btnConfirmB);
+        btnsStateB.appendChild(btnImpB);
+        btnsStateB.appendChild(btnSupprB);
 
-        btnsStateO.appendChild(btnManquant);
+        btnsStateO.appendChild(btnManquantO);
 
-        btnsStateNull.appendChild(btnConfirm);
-        btnsStateNull.appendChild(btnManquant);
-        btnsStateNull.appendChild(btnImp);
-        btnsStateNull.appendChild(btnSuppr);
+        btnsStateNull.appendChild(btnConfirmNull);
+        btnsStateNull.appendChild(btnManquantNull);
+        btnsStateNull.appendChild(btnImpNull);
+        btnsStateNull.appendChild(btnSupprB);
+
+        console.log(btnsStateO)
 
         let stateO = document.createElement('div');
         stateO.className = 'bg-orangeBase/20 rounded-full flex items-center justify-center w-[35px] h-[35px]';
@@ -181,7 +215,9 @@ export class LignesPage extends HTMLElement {
             
             let commentText = '';
             if (ligne.Lf_coin && ligne.Lf_coin.trim() !== '') {
-                commentText = ligne.Lf_coin.split('#')[0] || ligne.Lf_coin;
+                commentText = ligne.Lf_coin.split('#')[0];
+            } else {
+                commentText = ligne.Lf_coin;
             }
             const commentRow = {
                 id: ligne.Art_cod + '_comment',
@@ -191,7 +227,7 @@ export class LignesPage extends HTMLElement {
                         tdData: `<div class="text-gray-700">Commentaire : ${commentText}</div>`, 
                         css: 'comment-cell', 
                         type: 'html',
-                        attr: { colspan: 6 }
+                        attr: { colspan: 7 }
                     }
                 ]
             };
@@ -228,7 +264,7 @@ export class LignesPage extends HTMLElement {
             <div class='w-[500px] mb-6'>
                 <h3 class='font-bold text-3xl mb-3'>Scanner un lot</h3>
                 <div class='relative'>
-                    <sg-input input='number' idname='inpScanLot' inputCss='h-20 !rounded-md px-6 text-xl' placeholder='Numéro de lot'></sg-input>
+                    <sg-input input='number' idname='inpScanLot' inputCss='!h-20 !rounded-md px-6 text-xl' placeholder='Numéro de lot'></sg-input>
                     <div class='absolute right-6 bottom-0 h-20 !rounded-md flex items-center'><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scan-barcode-icon lucide-scan-barcode"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 7v10"/><path d="M12 7v10"/><path d="M17 7v10"/></svg></div>
                 </div>
             </div>
@@ -364,7 +400,23 @@ export class LignesPage extends HTMLElement {
 
                 document.getElementById('modalContent').innerHTML = html;
 
-                this.querySelector('[idname="prepaTabStock"]').setAttribute('data', JSON.stringify(this.formatTableStock(stocks)));
+                const tableElement = this.querySelector('[idname="prepaTabStock"]');
+                tableElement.setAttribute('data', JSON.stringify(this.formatTableStock(stocks)));
+
+                setTimeout(() => {
+                    const tableRows = tableElement.querySelectorAll('tbody tr');
+                    tableRows.forEach(row => {
+                        row.addEventListener('click', () => {
+                            const lotId = row.dataset.id;
+                            const selectedStock = stocks.find(stock => String(stock.lot_cod) === String(lotId));
+                            if (selectedStock) {
+                                this.confirmStockRow(JSON.stringify(detail), JSON.stringify(selectedStock));
+                            }
+                        });
+                        // Add pointer cursor to indicate clickable rows
+                        row.classList.add('cursor-pointer', 'hover:bg-gray-100');
+                    });
+                }, 100);
             })
     }
 
@@ -418,22 +470,44 @@ export class LignesPage extends HTMLElement {
 
                     document.getElementById('modalContent').innerHTML = html;
 
-                    this.querySelector('[idname="prepaTabStock"]').setAttribute('data', JSON.stringify(this.formatTableStock(stocksArt)));
+                    const tableElement = this.querySelector('[idname="prepaTabStock"]');
+                    tableElement.setAttribute('data', JSON.stringify(this.formatTableStock(stocksArt)));
+
+                    setTimeout(() => {
+                        const tableRows = tableElement.querySelectorAll('tbody tr');
+                        tableRows.forEach(row => {
+                            row.addEventListener('click', () => {
+                                const lotId = row.dataset.id;
+                                const selectedStock = stocksArt.find(stock => String(stock.lot_cod) === String(lotId));
+                                if (selectedStock) {
+                                    this.confirmStockRow(JSON.stringify(detail), JSON.stringify(selectedStock));
+                                }
+                            });
+                            // Add pointer cursor to indicate clickable rows
+                            row.classList.add('cursor-pointer', 'hover:bg-gray-100');
+                        });
+                    }, 100);
             });
     }
 
     confirmStockRow(detail, lot) {
         detail = JSON.parse(detail);
+        lot = JSON.parse(lot);
+
+        const self = this;
 
         $.confirm({
             title: 'Confirmation Lot',
             content: 'Confirmez-vous la sélection du lot ' + lot.lot_cod + ' ?',
+            useBootstrap: false,
+            boxWidth: '70%',
             buttons: {
                 Confirmer: function () {
-                    this.globalModel.setStk(detail.Fac_nbl, detail.Lf_lig, lot.lot_cod, detail.LflLig)
+                    self.globalModel.setStk(detail.Fac_nbl, detail.Lf_lig, lot.lot_cod, detail.Lfl_lig)
                        .then(response => {
-                           detail.Lot_cod = response.response.iLot_cod;
-                           detail.LflLig = response.response.iLfl_lig;
+                        console.log(response);
+                           detail.Lot_cod = response.iLot_cod;
+                           detail.LflLig = response.iLfl_lig;
 
                            let rowLf = document.getElementById('tableLignes').getElementsByClassName('prepa-lf');
                            [...rowLf].forEach(tr => {
@@ -444,12 +518,40 @@ export class LignesPage extends HTMLElement {
 
                            document.getElementById('modal').classList.add('hidden');
                            document.getElementById('modalContent').innerHTML = '';
-                           this.loadLignesData(detail.Fac_nbl);
+                           window.location.reload();
                        })
                 },
                 Annuler: function () {
                     document.getElementById('modal').classList.add('hidden');
                     document.getElementById('modalContent').innerHTML = '';
+                }
+            }
+        })
+    }
+
+    setManquant(facNbl, lflLig, isManquant = false) {
+        const self = this;
+        $.confirm({
+            title: (isManquant ? 'Annulation manquant' : 'Confirmation manquant'),
+            content: (isManquant ? 'Êtes-vous sûr de vouloir annuler le manquant ?' : 'Êtes-vous sûr de vouloir passer cette ligne en manquant ?'),
+            useBootstrap: false,
+            boxWidth: '70%',
+            buttons: {
+                Confirmer: function () {
+                    self.globalModel.setManquant(facNbl, lflLig)
+                        .then(response => {
+                            console.log(response);
+                            if (response && response.lOk == 'true') {
+                                //self.loadLignesData(facNbl);
+                                window.location.reload();
+                            } else {
+                                console.warn("Opération terminée, mais aucune ligne n'a été retournée");
+
+                            }
+                        })
+                },
+                Annuler: function () {
+
                 }
             }
         })

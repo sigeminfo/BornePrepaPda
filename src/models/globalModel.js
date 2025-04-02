@@ -226,8 +226,8 @@ export class Global {
             const data = {
                 "request": {
                     "IOjson": {
-                        "IOfacNbl": facNbl,
-                        "IOlfLig": lfLig
+                        "IOfacNbl": `${facNbl}`,	
+                        "IOlfLig": `${lfLig}`
                     }
                 }
             };
@@ -269,10 +269,10 @@ export class Global {
             const data = {
                 "request": {
                     "IOjson": {
-                        "IOfacNbl": facNbl,
-                        "IOlfLig": lfLig,
-                        "IOlotCod": lotCod,
-                        "IOlflLig": lflLig
+                        "IOfacNbl": `${facNbl}`,
+                        "IOlfLig": `${lfLig}`,
+                        "IOlotCod": `${lotCod}`,
+                        "IOlflLig": `${lflLig}`
                     }
                 }
             };
