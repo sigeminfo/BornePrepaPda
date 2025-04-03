@@ -44,3 +44,26 @@ export function moreDate() {
         dateInput.value = currentDate.toISOString().split('T')[0];
     }
 }
+
+export function impression(facNbl = 0, typeImp = "") {
+    import('../models/globalModel.js')
+        .then(async module => {
+            const globalModel = new module.Global();
+
+            const imgUrl = import.meta.env.VITE_IMG_URL;
+
+            const response = await globalModel.impression(facNbl, typeImp);
+            console.log("Impression successful:", response);
+            //return response;
+            let printFrame = document.getElementById('impFrame');
+            console.log(printFrame);
+            printFrame.src = imgUrl + response.IOurl;
+            printFrame.style.display = 'block';
+            printFrame.contentWindow.focus();
+            return response;
+        })
+        .catch(error => {
+            console.error("Error during impression:", error);
+            throw error;
+        });   
+}

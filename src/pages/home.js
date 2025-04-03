@@ -3,7 +3,7 @@ import '../components/Btn.js';
 import '../components/Input.js';
 import '../components/InputDouble.js';
 import '../components/Select.js';
-import { lessDate, moreDate } from '../utils/lib.js';
+import { lessDate, moreDate, impression } from '../utils/lib.js';
 
 import { Global } from '../models/globalModel.js';
 
@@ -43,6 +43,13 @@ export class HomePage extends HTMLElement {
         document.getElementById('btnFiltre').addEventListener('click', this.getFac.bind(this));
         document.getElementById('lessDateBtn').addEventListener('click', lessDate);
         document.getElementById('moreDateBtn').addEventListener('click', moreDate);
+        window.addEventListener("click", (e) => {
+            if (e.target != document.getElementById("impFrame")) {
+                let printFrame = document.getElementById("impFrame");
+                printFrame.style.display = "none";
+                printFrame.src = "";
+            }
+        });
     }
 
     toggleEntete() {
@@ -62,6 +69,22 @@ export class HomePage extends HTMLElement {
     }
 
     handleTableClick(event) {
+        // On vérifie d'abord si le click n'a pas été effectué sur le bouton d'impression
+        const printButton = event.target.closest('.prepaImpBl');
+        if (printButton) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const row = printButton.closest('tr');
+            if (row) {
+                const facNbl = row.getAttribute('data-id');
+                if (facNbl) {
+                        impression(facNbl, 'BL');
+                }
+            }
+            return;
+        }
+        
         const td = event.target.closest('td');
         if (!td) return;
         const tr = td.parentElement;
@@ -99,7 +122,7 @@ export class HomePage extends HTMLElement {
     
     formatTable() {
         let button = document.createElement('sg-btn');
-        button.setAttribute('css', 'bg-dblueBase p-2 text-white rounded flex items-center cancelUpdate');
+        button.setAttribute('css', 'bg-dblueBase p-2 text-white rounded flex items-center prepaImpBl');
         button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>';
         let options = { day: '2-digit', month: '2-digit', year: 'numeric' };
         return {
