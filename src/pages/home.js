@@ -43,11 +43,27 @@ export class HomePage extends HTMLElement {
         document.getElementById('btnFiltre').addEventListener('click', this.getFac.bind(this));
         document.getElementById('lessDateBtn').addEventListener('click', lessDate);
         document.getElementById('moreDateBtn').addEventListener('click', moreDate);
+        document.getElementById('stateFiltre').addEventListener('change', this.filterTableByState.bind(this));
         window.addEventListener("click", (e) => {
             if (e.target != document.getElementById("impFrame")) {
                 let printFrame = document.getElementById("impFrame");
                 printFrame.style.display = "none";
                 printFrame.src = "";
+            }
+        });
+    }
+
+    filterTableByState(event) {
+        const selectedValue = event.target.value;
+        const tableRows = document.querySelectorAll('#tableCmd tbody tr');
+        
+        tableRows.forEach(row => {
+            if (selectedValue === 'all') {
+                row.style.display = '';
+            } else if (selectedValue === 'inprogress') {
+                row.style.display = row.classList.contains('cmdInProgress') ? '' : 'none';
+            } else if (selectedValue === 'completed') {
+                row.style.display = row.classList.contains('cmdCompleted') ? '' : 'none';
             }
         });
     }
@@ -63,7 +79,7 @@ export class HomePage extends HTMLElement {
             entete.style.transform = 'translateY(0)';
             chevron.style.transform = 'rotate(0deg)';
         } else {
-            entete.style.transform = 'translateY(-9.75rem)';
+            entete.style.transform = 'translateY(-12.75rem)';
             chevron.style.transform = 'rotate(180deg)';
         }
     }
@@ -135,25 +151,34 @@ export class HomePage extends HTMLElement {
                 { lib: 'Action' }
             ],
             tbody:
-                this.fac && this.fac.map(val => ({
-                    id: val.fac_nbl,
-                    //attr: { lib:'data-lot', value: stock.lot_cod },
-                    trData: [
-                        { tdData: new Date(val.datebl).toLocaleDateString('fr-FR', options), css: 'date', type: '' },
-                        { tdData: val.fac_nbl, css: 'commande text-right', type: '' },
-                        { tdData: val.cli_nom, css: 'client', type: '' },
-                        { tdData: val.nbCdePrep + ' / ' + val.nbLig, css: 'lignes text-right', type: '' },
-                        { tdData: val.tou_nom, css: 'tournee', type: '' },
-                        { tdData: button.outerHTML, css: '', type: 'button' },
-                    ]
-                }))
+                this.fac && this.fac.map(val => {
+                    let rowClass = '';
+                    if (parseInt(val.nbCdePrep) === parseInt(val.nbLig)) {
+                        rowClass = 'cmdCompleted';
+                    } else {
+                        rowClass = 'cmdInProgress';
+                    }
+
+                    return {
+                        id: val.fac_nbl,
+                        css: rowClass,
+                        trData: [
+                            { tdData: new Date(val.datebl).toLocaleDateString('fr-FR', options), css: 'date', type: '' },
+                            { tdData: val.fac_nbl, css: 'commande text-right', type: '' },
+                            { tdData: val.cli_nom, css: 'client', type: '' },
+                            { tdData: val.nbCdePrep + ' / ' + val.nbLig, css: 'lignes text-right', type: '' },
+                            { tdData: val.tou_nom, css: 'tournee', type: '' },
+                            { tdData: button.outerHTML, css: '', type: 'button' },
+                        ]
+                    }
+                })
         }
     }
 
     render() {
         this.innerHTML = `
             <main id='main' role='main' class='h-full flex flex-col relative'>
-                <div id='entete' class='flex flex-col items-center w-full absolute top-0 left-0 right-0 z-10 -translate-y-[9.75rem]'>
+                <div id='entete' class='flex flex-col items-center w-full absolute top-0 left-0 right-0 z-10 -translate-y-[12.75rem]'>
                     <div class='bg-white shadow p-3 w-full flex flex-col gap-3'>
                         <div class='flex justify-between'>
                             <sg-input idname='cliFiltre' label='Client' placeholder='Nom du client' input='text' inputCss='grow' class='w-[45%]'></sg-input>
@@ -171,6 +196,9 @@ export class HomePage extends HTMLElement {
                         </div>
                         <div class='flex justify-between'>
                             <sg-input idname='comFiltre' label='N° Commande' placeholder='N° Commande' input='text' inputCss='grow' class='w-[45%]'></sg-input>
+                            <sg-select idname='stateFiltre' label='État commande' selectCss='grow' class='w-[45%]' options='[{"value": "all", "lib": "Toutes les commandes"}, {"value": "inprogress", "lib": "En cours"}, {"value": "completed", "lib": "Préparées"}]'></sg-select>
+                        </div>
+                        <div class='flex justify-end'>
                             <sg-btn idname='btnFiltre' css='h-9 text-white bg-dblueBase px-3 rounded'>Rechercher</sg-btn>
                         </div>
                     </div>

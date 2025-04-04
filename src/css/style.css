@@ -83,10 +83,10 @@ input[type=number] {
   transition: transform 0.3s ease-in-out;
 }
 
-#entete sg-input > div {
+#entete sg-input > div, #entete sg-select > div {
   flex-direction:row !important;
   align-items:center;
 }
-#entete sg-input > div label {
+#entete sg-input > div label, #entete sg-select > div label {
   width:120px;
 }

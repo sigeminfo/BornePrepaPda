@@ -12,6 +12,7 @@ export default class Input extends CustomElement {
         const value = this.getAttribute('value') || '';
         const placeholder = this.getAttribute('placeholder') || '';
         const disabled = this.getAttribute('disabled') || '';
+        const step = this.getAttribute('step') || '';
 
         // On crée le conteneur principal
         const container = document.createElement('div');
@@ -35,6 +36,9 @@ export default class Input extends CustomElement {
         }
         if (attr) {
             inputElt.setAttribute(attr['lib'], attr['value']);
+        }
+        if (step) {
+            inputElt.step = step;
         }
         inputElt.value = value;
         container.appendChild(inputElt);

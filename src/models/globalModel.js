@@ -205,8 +205,8 @@ export class Global {
             const data = {
                 "request": {
                     "IOjson": {
-                        "IOfacNbl": facNbl,
-                        "IOlfLig": lfLig
+                        "IOfacNbl": `${facNbl}`,
+                        "IOlfLig": `${lfLig}`
                     }
                 }
             };

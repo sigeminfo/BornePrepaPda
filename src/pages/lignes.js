@@ -1,7 +1,7 @@
 import '../components/TableClassic.js';
 import '../components/Btn.js';
 import '../components/Input.js';
-import { getUrlParameter } from '../utils/lib.js';
+import { getUrlParameter, impression } from '../utils/lib.js';
 import { Global } from '../models/globalModel.js';
 
 import { lessColis } from '../utils/lib.js';
@@ -53,6 +53,13 @@ export class LignesPage extends HTMLElement {
             document.getElementById('modal').classList.add('hidden');
             document.getElementById('modalContent').innerHTML = '';
         });
+        window.addEventListener("click", (e) => {
+            if (e.target != document.getElementById("impFrame")) {
+                let printFrame = document.getElementById("impFrame");
+                printFrame.style.display = "none";
+                printFrame.src = "";
+            }
+        });
     }
 
     toggleEntete() {
@@ -98,7 +105,6 @@ export class LignesPage extends HTMLElement {
 
                     // Ajout de l'event aux boutons "manquant"
                     const manquantButtons = tableElement.querySelectorAll('.manquant');
-                    
                     manquantButtons.forEach(btn => {
                         btn.addEventListener('click', (e) => {
                             e.stopPropagation(); // Prevent row click event
@@ -110,6 +116,32 @@ export class LignesPage extends HTMLElement {
                             }
                         });
                     });
+
+                    // Ajout de l'event aux boutons "supprimer"
+                    const supprButtons = tableElement.querySelectorAll('.supprLig');
+                    supprButtons.forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation(); // Prevent row click event
+                            const row = btn.closest('tr'); 
+                            if (row && row.dataset.ligne) {
+                                const ligne = JSON.parse(row.dataset.ligne);
+                                this.delFacLig(ligne.Fac_nbl, ligne.Lf_lig);
+                            }
+                        });
+                    });
+
+                    // Ajout de l'event aux boutons "imprimer"
+                    const imprBoutons = tableElement.querySelectorAll('.ligImpEtiq');
+                    imprBoutons.forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const row = btn.closest('tr');
+                            if (row && row.dataset.ligne) {
+                                const ligne = JSON.parse(row.dataset.ligne);
+                                impression(ligne.Fac_nbl, 'etiq');
+                            }
+                        })
+                    })
                 }, 100);
             } else {
                 console.warn("Pas de ligne retournée");
@@ -162,9 +194,9 @@ export class LignesPage extends HTMLElement {
         
         let btnSupprB = document.createElement('button');
         let btnSupprNull = document.createElement('button');
-        btnSupprB.className = 'suppr bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
+        btnSupprB.className = 'supprLig bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
         btnSupprB.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2-icon lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>';
-        btnSupprNull.className = 'suppr bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
+        btnSupprNull.className = 'supprLig bg-dblueBase text-white rounded w-[50px] h-[50px] flex items-center justify-center';
         btnSupprNull.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2-icon lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>';
 
         btnsStateB.appendChild(btnConfirmB);
@@ -287,6 +319,10 @@ export class LignesPage extends HTMLElement {
         console.log(detail);
         document.getElementById('modal').classList.remove('hidden');
         document.getElementById('modalContent').innerHTML = '';
+
+        const roundedPoidsNet = detail.Lf_poin ? Math.ceil(parseFloat(detail.Lf_poin) * 100) / 100 : 0;
+        const formattedPoidsNet = roundedPoidsNet.toFixed(2);
+
         const html = `
             <div class='flex flex-col gap-10'>
                 <div class='flex w-full items-end gap-6'>
@@ -294,7 +330,7 @@ export class LignesPage extends HTMLElement {
                         <sg-input idname='colis' label='Colis' input='text' inputCss='!rounded-l-md !h-14 px-4' class='grow' value=${detail.Lf_col}></sg-input>
                         <sg-btn idname='moinsCol' css='bg-dblueBase text-white rounded-r-md w-14 !h-14 flex items-center justify-center'>-</sg-btn>
                     </div>
-                    <sg-input idname='poidsnet' label='Poids Net' input='number' inputCss='!h-14 rounded-md px-4' class='w-[45%]' value=${detail.Lf_poin}></sg-input>
+                    <sg-input idname='poidsnet' label='Poids Net' input='number' inputCss='!h-14 rounded-md px-4' class='w-[45%]' value=${formattedPoidsNet} step="0.01"></sg-input>
                 </div>
 
                 <!--<div class='flex w-full gap-6'>
@@ -504,7 +540,7 @@ export class LignesPage extends HTMLElement {
             buttons: {
                 Confirmer: function () {
                     self.globalModel.setStk(detail.Fac_nbl, detail.Lf_lig, lot.lot_cod, detail.Lfl_lig)
-                       .then(response => {
+                        .then(response => {
                         console.log(response);
                            detail.Lot_cod = response.iLot_cod;
                            detail.LflLig = response.iLfl_lig;
@@ -518,8 +554,10 @@ export class LignesPage extends HTMLElement {
 
                            document.getElementById('modal').classList.add('hidden');
                            document.getElementById('modalContent').innerHTML = '';
-                           window.location.reload();
-                       })
+                           //window.location.reload();
+                           console.log('test');
+                           self.pesee(detail);
+                        })
                 },
                 Annuler: function () {
                     document.getElementById('modal').classList.add('hidden');
@@ -549,6 +587,30 @@ export class LignesPage extends HTMLElement {
 
                             }
                         })
+                },
+                Annuler: function () {
+
+                }
+            }
+        })
+    }
+
+    async delFacLig(facNbl, lflLig) {
+        const self = this;
+        $.confirm({
+            title: 'Suppression',
+            content: 'Êtes-vous sûr de vouloir supprimer cette ligne ?',
+            useBootstrap: false,
+            boxWidth: '70%',
+            buttons: {
+                Confirmer: function () {
+                    self.globalModel.delFacLig(facNbl, lflLig)
+                       .then(response => {
+                            console.log(response);
+                            if (response && response.lOk == 'true') {
+                                window.location.reload(); 
+                            }
+                       })  
                 },
                 Annuler: function () {
 

@@ -67,3 +67,26 @@ export function impression(facNbl = 0, typeImp = "") {
             throw error;
         });   
 }
+/*export function impression(facNbl = 0, typeImp = "") {
+    import('../models/globalModel.js')
+        .then(async module => {
+            const globalModel = new module.Global();
+            const imgUrl = import.meta.env.VITE_IMG_URL;
+            
+            // Obtenir l'URL du document à imprimer via l'API
+            const response = await globalModel.impression(facNbl, typeImp);
+            console.log("Impression successful:", response);
+            
+            // Construire l'URL complète
+            const printUrl = imgUrl + response.IOurl;
+            
+            // Ouvrir dans un nouvel onglet
+            window.open(printUrl, '_blank');
+            
+            return response;
+        })
+        .catch(error => {
+            console.error("Error during impression:", error);
+            throw error;
+        });   
+}*/
