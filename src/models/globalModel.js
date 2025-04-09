@@ -15,12 +15,13 @@ export class Global {
             const data = {
                 "request": {
                     "IOjson": {
-                        "IOid": id,
-                        "IOmdp": mdp
+                        "IOid": `${id}`,
+                        "IOmdp": `${mdp}`
                     }
                 }
             };
-            const  resp = await this.apiService.put(`${this.apiServiceSuffix}/cnx`, data );
+            const resp = await this.apiService.put(`${this.apiServiceSuffix}/cnx`, data );
+            console.log(resp);
             if (!resp?.response) {
                 throw new Error('Réponse invalide');
             }

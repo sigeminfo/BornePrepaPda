@@ -5,9 +5,27 @@ function loadComponent(route, params) {
     if (app) {
         // Nettoyer le contenu précédent
         app.innerHTML = "";
+
+        // Vérifier si l'utilisateur est connecté
+        const isAuthenticated = sessionStorage.getItem('isLogged') === 'true';
+
+        // Si l'utilisateur n'est pas connecté et n'est pas sur la page de login, rediriger vers login
+        if (!isAuthenticated && route !== "/login") {
+            window.location.hash = "/login";
+            return;
+        }
+
         // Charger le composant en fonction de la route
         switch (route) {
+            case "/login":
+                if (isAuthenticated) {
+                    window.location.hash = "/prepa";
+                } else {
+                    app.appendChild(document.createElement('login-page'));
+                }
+                break;
             case "/":
+            case "/prepa":
                 app.appendChild(document.createElement('home-page'));
                 break;
             case "/lignes":
