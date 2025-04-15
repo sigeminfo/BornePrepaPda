@@ -80,7 +80,6 @@ export class LignesPage extends HTMLElement {
 
     async loadLignesData(facNbl) {
         try {
-            console.log(facNbl);
             this.lignes = await this.globalModel.getFacLig(facNbl);
 
             if (this.lignes && this.lignes.length > 0) {
@@ -210,8 +209,6 @@ export class LignesPage extends HTMLElement {
         btnsStateNull.appendChild(btnImpNull);
         btnsStateNull.appendChild(btnSupprB);
 
-        console.log(btnsStateO)
-
         let stateO = document.createElement('div');
         stateO.className = 'bg-orangeBase/20 rounded-full flex items-center justify-center w-[35px] h-[35px]';
         let sousStateO = document.createElement('div');
@@ -223,7 +220,7 @@ export class LignesPage extends HTMLElement {
         let tbody = []
 
         let rowIndex = 0;
-        console.log(this.lignes);
+    
         this.lignes.forEach(ligne => {
             // Main row with article data
             const bgColorClass = rowIndex % 4 < 2 ? '!bg-white' : '!bg-dblueLight';
@@ -234,7 +231,7 @@ export class LignesPage extends HTMLElement {
                 attr: { 'data-ligne': JSON.stringify(ligne) },
                 trData: [
                     { tdData: (ligne.Lf_prev != "" ? stateB.outerHTML : (ligne.Art_cod == '*' ? stateO.outerHTML : stateNull)), css: 'etat', type: '' },
-                    { tdData: ligne.Lot_cod, css: 'lot', type: '' },
+                    { tdData: ligne.Lot_cod, css: 'lot text-right', type: '' },
                     { tdData: (ligne.Lf_typ == 'K' ? ligne.Lf_poin : (ligne.Lf_typ == 'P' ? ligne.Lf_pito : ligne.Lf_col)), css: 'quantite text-right', type: '' },
                     { tdData: ligne.Lf_typ, css: 'unite', type: '' },
                     { tdData: ligne.Art_cod, css: 'artcod', type: '' },
@@ -316,7 +313,7 @@ export class LignesPage extends HTMLElement {
     }
 
     pesee(detail) {
-        console.log(detail);
+        //console.log(detail);
         document.getElementById('modal').classList.remove('hidden');
         document.getElementById('modalContent').innerHTML = '';
 
@@ -526,12 +523,12 @@ export class LignesPage extends HTMLElement {
             });
     }
 
-    confirmStockRow(detail, lot) {
+    confirmStockRow(detail, lot, lf = "") {
         detail = JSON.parse(detail);
         lot = JSON.parse(lot);
 
         const self = this;
-
+        console.log(lot)
         $.confirm({
             title: 'Confirmation Lot',
             content: 'Confirmez-vous la sélection du lot ' + lot.lot_cod + ' ?',
@@ -539,7 +536,8 @@ export class LignesPage extends HTMLElement {
             boxWidth: '70%',
             buttons: {
                 Confirmer: function () {
-                    self.globalModel.setStk(detail.Fac_nbl, detail.Lf_lig, lot.lot_cod, detail.Lfl_lig)
+                    console.log(lf);
+                    self.globalModel.setStk(detail.Fac_nbl, (lf ? lf : detail.Lf_lig), lot.lot_cod, lot.lfl_lig)
                         .then(response => {
                         console.log(response);
                            detail.Lot_cod = response.iLot_cod;
@@ -556,7 +554,12 @@ export class LignesPage extends HTMLElement {
                            document.getElementById('modalContent').innerHTML = '';
                            //window.location.reload();
                            console.log('test');
-                           self.pesee(detail);
+                           if (response.iLf_lig > 0 && response.iFac_nbl > 0) {
+                               self.gestionReliquat(detail, JSON.stringify(response));
+                           } else {
+                               self.pesee(detail);
+                           }
+                           
                         })
                 },
                 Annuler: function () {
@@ -565,6 +568,47 @@ export class LignesPage extends HTMLElement {
                 }
             }
         })
+    }
+
+    gestionReliquat(detail, response) {
+        response = JSON.parse(response);
+        document.getElementById('modalContent').innerHTML = '';
+        document.getElementById('modal').classList.remove('hidden');
+
+        let html;
+
+        this.globalModel.getIntStk(response.iFac_nbl, response.iLf_lig)
+        .then(resp => {
+            let stocksArt = resp?.dsStk?.dsStk?.ttStk || [];
+            html = `
+                <div>
+                    <h3 class='mb-3'>Gestion de reliquat</h3>
+                    <div>
+                        <sg-table idname='prepaTabStock' css='table sgTableBorder' class='bg-white h-full rounded-t-2xl'></sg-table>
+                    </div>
+                </div>`;
+
+                document.getElementById('modalContent').innerHTML = html;
+
+                const tableElement = this.querySelector('[idname="prepaTabStock"]');
+                tableElement.setAttribute('data', JSON.stringify(this.formatTableStock(stocksArt)));
+
+                setTimeout(() => {
+                    const tableRows = tableElement.querySelectorAll('tbody tr');
+                    tableRows.forEach(row => {
+                        row.addEventListener('click', () => {
+                            const lotId = row.dataset.id;
+                            const selectedStock = stocksArt.find(stock => String(stock.lot_cod) === String(lotId));
+                            if (selectedStock) {
+                                console.log(response.iLfl_lig);
+                                this.confirmStockRow(JSON.stringify(detail), JSON.stringify(selectedStock), response.iLf_lig);
+                            }
+                        });
+                        // Add pointer cursor to indicate clickable rows
+                        row.classList.add('cursor-pointer', 'hover:bg-gray-100');
+                    });
+                }, 100);
+        });
     }
 
     setManquant(facNbl, lflLig, isManquant = false) {

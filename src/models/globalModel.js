@@ -277,6 +277,7 @@ export class Global {
                     }
                 }
             };
+            console.log(data);
             const resp = await this.apiService.put(`${this.apiServiceSuffix}/setStk`, data );
             if (!resp?.response) {
                 throw new Error('Réponse invalide');
