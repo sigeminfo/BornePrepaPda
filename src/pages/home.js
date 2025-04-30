@@ -40,10 +40,16 @@ export class HomePage extends HTMLElement {
     // setup des événements
     setupEventListeners() {
         document.getElementById('toggleEntete').addEventListener('click', this.toggleEntete.bind(this));
-        document.getElementById('btnFiltre').addEventListener('click', this.getFac.bind(this));
+        document.getElementById('btnFiltre').addEventListener('click', () => {
+            this.toggleEntete();
+            this.getFac();
+        });
         document.getElementById('lessDateBtn').addEventListener('click', lessDate);
         document.getElementById('moreDateBtn').addEventListener('click', moreDate);
-        document.getElementById('stateFiltre').addEventListener('change', this.filterTableByState.bind(this));
+        document.getElementById('stateFiltre').addEventListener('change', (event) => {
+            this.toggleEntete();
+            this.filterTableByState(event);
+        });
         window.addEventListener("click", (e) => {
             if (e.target != document.getElementById("impFrame")) {
                 let printFrame = document.getElementById("impFrame");
@@ -64,6 +70,8 @@ export class HomePage extends HTMLElement {
                 row.style.display = row.classList.contains('cmdInProgress') ? '' : 'none';
             } else if (selectedValue === 'completed') {
                 row.style.display = row.classList.contains('cmdCompleted') ? '' : 'none';
+            } else if (selectedValue === 'none') {
+                row.style.display = row.classList.contains('cmdNone') ? '' : 'none';
             }
         });
     }
@@ -144,17 +152,21 @@ export class HomePage extends HTMLElement {
         return {
             thead: [
                 { lib: 'Date'},
-                { lib: 'N° de commande', css: 'text-right' },
+                { lib: 'N°', css: 'text-right' },
                 { lib: 'Client'},
-                { lib: 'Lignes préparées', css: 'text-right'},
+                { lib: 'Commentaire' },
+                { lib: 'Lignes', css: 'text-right'},
                 { lib: 'Tournées' },
                 { lib: 'Action' }
             ],
             tbody:
                 this.fac && this.fac.map(val => {
+                    //console.log(val);
                     let rowClass = '';
                     if (parseInt(val.nbCdePrep) === parseInt(val.nbLig)) {
                         rowClass = 'cmdCompleted';
+                    } else if (parseInt(val.nbCdePrep) === 0) {
+                        rowClass = 'cmdNone';
                     } else {
                         rowClass = 'cmdInProgress';
                     }
@@ -166,6 +178,7 @@ export class HomePage extends HTMLElement {
                             { tdData: new Date(val.datebl).toLocaleDateString('fr-FR', options), css: 'date', type: '' },
                             { tdData: val.fac_nbl, css: 'commande text-right', type: '' },
                             { tdData: val.cli_nom, css: 'client', type: '' },
+                            { tdData: val.fac_coin, css: 'commentaire' },
                             { tdData: val.nbCdePrep + ' / ' + val.nbLig, css: 'lignes text-right', type: '' },
                             { tdData: val.tou_nom, css: 'tournee', type: '' },
                             { tdData: button.outerHTML, css: '', type: 'button' },
@@ -196,7 +209,7 @@ export class HomePage extends HTMLElement {
                         </div>
                         <div class='flex justify-between'>
                             <sg-input idname='comFiltre' label='N° Commande' placeholder='N° Commande' input='text' inputCss='grow' class='w-[45%]'></sg-input>
-                            <sg-select idname='stateFiltre' label='État commande' selectCss='grow' class='w-[45%]' options='[{"value": "all", "lib": "Toutes les commandes"}, {"value": "inprogress", "lib": "En cours"}, {"value": "completed", "lib": "Préparées"}]'></sg-select>
+                            <sg-select idname='stateFiltre' label='État commande' selectCss='grow' class='w-[45%]' options='[{"value": "all", "lib": "Toutes les commandes"}, {"value": "inprogress", "lib": "En cours"}, {"value": "completed", "lib": "Préparées"}, {"value": "none", "lib": "Non préparées"}]'></sg-select>
                         </div>
                         <div class='flex justify-end'>
                             <sg-btn idname='btnFiltre' css='h-9 text-white bg-dblueBase px-3 rounded'>Rechercher</sg-btn>

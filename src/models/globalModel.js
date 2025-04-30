@@ -232,7 +232,9 @@ export class Global {
                     }
                 }
             };
+            console.log(data);
             const resp = await this.apiService.put(`${this.apiServiceSuffix}/setManquant`, data );
+            console.log(resp);
             if (!resp?.response) {
                 throw new Error('Réponse invalide');
             }
@@ -300,6 +302,7 @@ export class Global {
                 }
             };
             const resp = await this.apiService.put(`${this.apiServiceSuffix}/getArtFromFam`, data );
+            console.log(resp);
             if (!resp?.response?.dsStk?.dsStk?.ttStk) {
                 throw new Error('Réponse invalide');
             }
@@ -318,6 +321,30 @@ export class Global {
                 }
             };
             const resp = await this.apiService.put(`${this.apiServiceSuffix}/getInfos`, data );
+            if (!resp?.response) {
+                throw new Error('Réponse invalide');
+            }
+            return resp?.response;
+        } catch (error) {
+            ErrorsHandler.handleError(error);
+            throw error;
+        }
+    }
+
+    async setArt(facNbl, lfLig, lotCod, lflLig) {
+        try {
+            const data = {
+                "request": {
+                    "IOjson": {
+                        "IOfacNbl": `${facNbl}`,
+                        "IOlfLig": `${lfLig}`,
+                        "IOlotCod": `${lotCod}`,
+                        "IOlflLig": `${lflLig}`
+                    }
+                }
+            };
+            console.log(data);
+            const resp = await this.apiService.put(`${this.apiServiceSuffix}/setArt`, data );
             if (!resp?.response) {
                 throw new Error('Réponse invalide');
             }

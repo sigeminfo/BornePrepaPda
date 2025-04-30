@@ -47,12 +47,17 @@ export class LignesPage extends HTMLElement {
     }
 
     setupEventListeners() {
+        
+        document.getElementById('goBack').addEventListener('click', () => {
+            window.location.hash = '/prepa';
+        });
         document.getElementById('toggleEntete').addEventListener('click', this.toggleEntete.bind(this));
 
-        document.getElementById('clodeModal').addEventListener('click', () => {
+        document.getElementById('closeModal').addEventListener('click', () => {
             document.getElementById('modal').classList.add('hidden');
             document.getElementById('modalContent').innerHTML = '';
         });
+
         window.addEventListener("click", (e) => {
             if (e.target != document.getElementById("impFrame")) {
                 let printFrame = document.getElementById("impFrame");
@@ -72,9 +77,11 @@ export class LignesPage extends HTMLElement {
         if (this.isEnteteVisible) {
             entete.style.transform = 'translateY(0)';
             chevron.style.transform = 'rotate(0deg)';
+            entete.classList.add('z-50');
         } else {
             entete.style.transform = 'translateY(-6.75rem)';
             chevron.style.transform = 'rotate(180deg)';
+            entete.classList.remove('z-50');
         }
     }
 
@@ -222,6 +229,7 @@ export class LignesPage extends HTMLElement {
         let rowIndex = 0;
     
         this.lignes.forEach(ligne => {
+            console.log(ligne);
             // Main row with article data
             const bgColorClass = rowIndex % 4 < 2 ? '!bg-white' : '!bg-dblueLight';
             rowIndex += 2;
@@ -232,7 +240,7 @@ export class LignesPage extends HTMLElement {
                 trData: [
                     { tdData: (ligne.Lf_prev != "" ? stateB.outerHTML : (ligne.Art_cod == '*' ? stateO.outerHTML : stateNull)), css: 'etat', type: '' },
                     { tdData: ligne.Lot_cod, css: 'lot text-right', type: '' },
-                    { tdData: (ligne.Lf_typ == 'K' ? ligne.Lf_poin : (ligne.Lf_typ == 'P' ? ligne.Lf_pito : ligne.Lf_col)), css: 'quantite text-right', type: '' },
+                    { tdData: (ligne.Lf_typ == 'K' ? (ligne.Lf_poin ? (Math.ceil(parseFloat(ligne.Lf_poin) * 100) / 100).toFixed(2) : '0.00') : (ligne.Lf_typ == 'P' ? ligne.Lf_pito : ligne.Lf_col)), css: 'quantite text-right', type: '' },
                     { tdData: ligne.Lf_typ, css: 'unite', type: '' },
                     { tdData: ligne.Art_cod, css: 'artcod', type: '' },
                     { tdData: ligne.Art_lib, css: 'artlib', type: '' },
@@ -252,11 +260,15 @@ export class LignesPage extends HTMLElement {
                 id: ligne.Art_cod + '_comment',
                 css: `comment-row bg-gray-100 ${bgColorClass} ${commentText.trim() === '' ? 'hidden' : ''}`,
                 trData: [
+                    {
+                        tdData: '',
+                        attr: { colspan: 5}
+                    },
                     { 
                         tdData: `<div class="text-gray-700">Commentaire : ${commentText}</div>`, 
                         css: 'comment-cell', 
                         type: 'html',
-                        attr: { colspan: 7 }
+                        attr: { colspan: 2 }
                     }
                 ]
             };
@@ -424,8 +436,8 @@ export class LignesPage extends HTMLElement {
                 let stocks = response?.dsStk?.dsStk?.ttStk || [];
                 let html;
                 html = `
-                    <div>
-                        <div>
+                    <div class='h-full'>
+                        <div class='h-full overflow-y-scroll'>
                             <sg-table idname='prepaTabStock' css='table sgTableBorder' class='bg-white h-full rounded-t-2xl'></sg-table>
                         </div>
                     </div>
@@ -468,6 +480,7 @@ export class LignesPage extends HTMLElement {
             tbody:
                 stocks && stocks.map(val => ({
                     id: val.lot_cod,
+                    attr: { 'data-lfl': val.lfl_lig || '' },
                     trData: [
                         { tdData: val.ent_cod, css: 'ent', type: '' },
                         { tdData: val.lot_cod, css: 'lot', type: '' },
@@ -494,9 +507,9 @@ export class LignesPage extends HTMLElement {
                 let stocksArt = response?.dsStk?.dsStk?.ttStk || [];
 
                 html = `
-                    <div>
+                    <div class='h-full'>
                         <h3 class='flex gap-3 items-center mb-3'><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-triangle-alert"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> L'article initial n'est plus en stock. Voici la liste des articles de la même famille disponibles.</h3>
-                        <div>
+                        <div class='h-full overflow-y-scroll'>
                             <sg-table idname='prepaTabStock' css='table sgTableBorder' class='bg-white h-full rounded-t-2xl'></sg-table>
                         </div>
                     </div>`;
@@ -581,9 +594,9 @@ export class LignesPage extends HTMLElement {
         .then(resp => {
             let stocksArt = resp?.dsStk?.dsStk?.ttStk || [];
             html = `
-                <div>
+                <div class='h-full'>
                     <h3 class='mb-3'>Gestion de reliquat</h3>
-                    <div>
+                    <div class='h-full overflow-y-scroll'>
                         <sg-table idname='prepaTabStock' css='table sgTableBorder' class='bg-white h-full rounded-t-2xl'></sg-table>
                     </div>
                 </div>`;
@@ -600,7 +613,6 @@ export class LignesPage extends HTMLElement {
                             const lotId = row.dataset.id;
                             const selectedStock = stocksArt.find(stock => String(stock.lot_cod) === String(lotId));
                             if (selectedStock) {
-                                console.log(response.iLfl_lig);
                                 this.confirmStockRow(JSON.stringify(detail), JSON.stringify(selectedStock), response.iLf_lig);
                             }
                         });
@@ -619,24 +631,98 @@ export class LignesPage extends HTMLElement {
             useBootstrap: false,
             boxWidth: '70%',
             buttons: {
-                Confirmer: function () {
-                    self.globalModel.setManquant(facNbl, lflLig)
-                        .then(response => {
-                            console.log(response);
-                            if (response && response.lOk == 'true') {
-                                //self.loadLignesData(facNbl);
-                                window.location.reload();
-                            } else {
-                                console.warn("Opération terminée, mais aucune ligne n'a été retournée");
+                Confirmer: {
+                    text: 'Confirmer Manquant',
+                    action:function () {
+                        self.globalModel.setManquant(facNbl, lflLig)
+                            .then(response => {
+                                console.log(response);
+                                if (response && response.lOk == 'true') {
+                                    //self.loadLignesData(facNbl);
+                                    window.location.reload();
+                                } else {
+                                    console.warn("Opération terminée, mais aucune ligne n'a été retournée");
 
-                            }
-                        })
+                                }
+                            })
+                    }
                 },
+                ...(isManquant ? {} : {
+                    Remplacer: {
+                        text: 'Remplacer Article',
+                        action: function () {
+                            self.getArtFromFam(facNbl, lflLig);
+                        }
+                    }
+                }),
                 Annuler: function () {
 
                 }
             }
         })
+    }
+
+    async getArtFromFam(facNbl, lfLig) {
+        const self = this;
+        document.getElementById('modalContent').innerHTML = '';
+        document.getElementById('modal').classList.remove('hidden');
+        let html;
+
+        this.globalModel.getArtFromFam(facNbl, lfLig)
+            .then(response => {
+                //console.log(response);
+                let artsFromFam = response;
+                    console.log(artsFromFam);
+                    html = `
+                        <div class='h-full'>
+                            <h3 class='mb-3'>Souhaitez-vous remplacer l'article par un autre ?</h3>
+                            <div class='overflow-y-scroll h-full'>
+                                <sg-table idname='prepaTabStock' css='table sgTableBorder' class='bg-white h-full rounded-t-2xl'></sg-table>
+                            </div>
+                        </div>`;
+                    document.getElementById('modalContent').innerHTML = html;
+
+                    const tableElement = this.querySelector('[idname="prepaTabStock"]');
+                    tableElement.setAttribute('data', JSON.stringify(this.formatTableStock(artsFromFam)));
+
+                    setTimeout(() => {
+                        const tableRows = tableElement.querySelectorAll('tbody tr');
+                        tableRows.forEach(row => {
+                            row.addEventListener('click', () => {
+                                const data = JSON.parse(row.dataset.trData);
+                                console.log(data);
+                                $.confirm({
+                                    title: 'Confirmation Article',
+                                    content: 'Confirmez-vous la sélection de l\'article ' + data[4].tdData + ' ?',
+                                    useBootstrap: false,
+                                    boxWidth: '70%',
+                                    buttons: {
+                                        Confirmer: function () {
+                                            self.setArt(facNbl, lfLig, data[1].tdData, row.dataset.lfl);
+                                        },
+                                        Annuler: function () {
+                                            
+                                        }
+                                    }
+                                })
+                            });
+                            // Add pointer cursor to indicate clickable rows
+                            row.classList.add('cursor-pointer', 'hover:bg-gray-100');
+                        });
+                    }, 100);
+            })
+    }
+
+    async setArt(facNbl, lfLig, lotCod, lflLig) {
+        this.globalModel.setArt(facNbl, lfLig, lotCod, lflLig)
+            .then(response => {
+                console.log(response);
+                if (response && response.lOk == 'true') {
+                    window.location.reload();
+                } else {
+                    console.warn("Opération terminée, mais aucune ligne n'a été retournée");
+                }
+            })
     }
 
     async delFacLig(facNbl, lflLig) {
@@ -652,7 +738,7 @@ export class LignesPage extends HTMLElement {
                        .then(response => {
                             console.log(response);
                             if (response && response.lOk == 'true') {
-                                window.location.reload(); 
+                               // window.location.reload(); 
                             }
                        })  
                 },
@@ -666,6 +752,7 @@ export class LignesPage extends HTMLElement {
     render() {
         this.innerHTML = `
             <main id='main' role='main' class='h-full flex flex-col relative'>
+                <sg-btn idname='goBack' css='z-20 rounded-full bg-dblueBase w-10 h-10 flex justify-center items-center absolute top-1 left-3'><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left-icon lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></sg-btn>
                 <div id='entete' class='flex flex-col items-center w-full absolute top-0 left-0 right-0 z-10 -translate-y-[6.75rem]'>
                     <div class='bg-white shadow p-3 w-full flex flex-col gap-3'>
                         <div class='flex justify-between'>
@@ -685,8 +772,8 @@ export class LignesPage extends HTMLElement {
                 </div>
 
                 <div id='modal' class='p-24 hidden fixed top-0 left-0 right-0 z-50 w-full h-full bg-white'>
-                    <div id='clodeModal' class='absolute top-12 right-12'><svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
-                    <div id='modalContent'></div>
+                    <div id='closeModal' class='absolute top-12 right-12'><svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+                    <div id='modalContent' class='h-full'></div>
                 </div>
             </main>
         `;
