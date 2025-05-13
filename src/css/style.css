@@ -90,3 +90,7 @@ input[type=number] {
 #entete sg-input > div label, #entete sg-select > div label {
   width:120px;
 }
+
+.artcod{
+  font-weight:bolder;
+}

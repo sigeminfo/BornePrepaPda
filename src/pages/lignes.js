@@ -240,7 +240,7 @@ export class LignesPage extends HTMLElement {
                 trData: [
                     { tdData: (ligne.Lf_prev != "" ? stateB.outerHTML : (ligne.Art_cod == '*' ? stateO.outerHTML : stateNull)), css: 'etat', type: '' },
                     { tdData: ligne.Lot_cod, css: 'lot text-right', type: '' },
-                    { tdData: (ligne.Lf_typ == 'K' ? (ligne.Lf_poin ? (Math.ceil(parseFloat(ligne.Lf_poin) * 100) / 100).toFixed(2) : '0.00') : (ligne.Lf_typ == 'P' ? ligne.Lf_pito : ligne.Lf_col)), css: 'quantite text-right', type: '' },
+                    { tdData: (ligne.Lf_typ == 'K' ? (ligne.Lf_poin ? (Math.ceil(parseFloat(ligne.Lf_poin) * 100) / 100).toFixed(1) : '0.0') : (ligne.Lf_typ == 'P' ? ligne.Lf_pito : ligne.Lf_col)), css: 'quantite text-right', type: '' },
                     { tdData: ligne.Lf_typ, css: 'unite', type: '' },
                     { tdData: ligne.Art_cod, css: 'artcod', type: '' },
                     { tdData: ligne.Art_lib, css: 'artlib', type: '' },
@@ -265,7 +265,7 @@ export class LignesPage extends HTMLElement {
                         attr: { colspan: 5}
                     },
                     { 
-                        tdData: `<div class="text-gray-700">Commentaire : ${commentText}</div>`, 
+                        tdData: `<div class="text-gray-700 font-black">Commentaire : ${commentText}</div>`, 
                         css: 'comment-cell', 
                         type: 'html',
                         attr: { colspan: 2 }
