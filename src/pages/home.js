@@ -103,7 +103,7 @@ export class HomePage extends HTMLElement {
             if (row) {
                 const facNbl = row.getAttribute('data-id');
                 if (facNbl) {
-                    handleValidation(facNbl); // assignation nb palettes + impression
+                    this.handleValidation(facNbl); // assignation nb palettes + impression
                     //impression(facNbl, 'BL');
                 }
             }
@@ -132,31 +132,34 @@ export class HomePage extends HTMLElement {
         let html = `
             <div class='flex flex-col gap-10'>
                 <div class='flex w-full items-end gap-6'>                    
-                    <sg-input idname='numPal' label='Nombre palettes' input='number' inputCss='!h-14 rounded-md px-4' class='w-[45%]' value=${formattedNumPal} step="0.01"></sg-input>
+                    <sg-input idname='numPal' label='Nombre palettes' input='number' inputCss='!h-14 rounded-md px-4' class='w-[45%]' value="" step="0.01"></sg-input>
                     <sg-btn idname='validNumPal' css='bg-dblueBase text-white rounded-md w-full !h-14 text-xl font-semibold' class='w-[45%]'>Valider</sg-btn>
                 </div>                
             </div>
         `;
 
+        document.getElementById('modal').classList.remove('hidden');
         document.getElementById('modalContent').innerHTML = html;
 
-        document.getElementById('validNumPal').addEventListener('click', () => {
-            this.updateFac(facNbl);
-        });
+        setTimeout(() => { 
+            document.getElementById('validNumPal').addEventListener('click', () => {
+                this.updateFac(facNbl);
+            });
+        }, 200);        
     }
 
     updateFac(facNbl) {
         const numPal = document.getElementById('numPal').value;
         this.globalModel.updFacNumPal(facNbl, numPal)
-            .then(response => {
-                console.log("Success :", response);
-                document.getElementById('modal').classList.add('hidden');
-                document.getElementById('modalContent').innerHTML = '';
-                this.loadFacData(facNbl);
-            })
-            .catch(error => {
-                console.error("Error updating line:", error);
-            });
+        .then(response => {
+            console.log("Success :", response);
+            document.getElementById('modal').classList.add('hidden');
+            document.getElementById('modalContent').innerHTML = '';
+            impression(facNbl, 'BL');
+        })
+        .catch(error => {
+            console.error("Error updating line:", error);
+        });
     }
 
     async getFac() {
