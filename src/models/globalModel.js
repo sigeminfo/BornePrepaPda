@@ -222,6 +222,28 @@ export class Global {
         }
     }
 
+    async updFacNumPal(facNbl, numPal) {
+        try {
+            const data = {
+                "request": {
+                    "IOjson": {
+                        "IOfacNbl": `${facNbl}`,
+                        "IOnumPal": `${numPal}`
+                    }
+                }
+            };
+            console.log(data);
+            const resp = await this.apiService.put(`${this.apiServiceSuffix}/setNumPal`, data );
+            if (!resp?.response) {
+                throw new Error('Réponse invalide');
+            }
+            return resp?.response;
+        } catch (error) {
+            ErrorsHandler.handleError(error);
+            throw error;
+        }
+    }
+
     async setManquant(facNbl, lfLig) {
         try {
             const data = {

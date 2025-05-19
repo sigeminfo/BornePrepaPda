@@ -103,7 +103,8 @@ export class HomePage extends HTMLElement {
             if (row) {
                 const facNbl = row.getAttribute('data-id');
                 if (facNbl) {
-                        impression(facNbl, 'BL');
+                    handleValidation(facNbl); // assignation nb palettes + impression
+                    //impression(facNbl, 'BL');
                 }
             }
             return;
@@ -125,6 +126,37 @@ export class HomePage extends HTMLElement {
             sessionStorage.setItem('date', date);
             window.location.hash = '/lignes?nbl=' + facNbl;
         }
+    }
+
+    handleValidation(facNbl) { 
+        let html = `
+            <div class='flex flex-col gap-10'>
+                <div class='flex w-full items-end gap-6'>                    
+                    <sg-input idname='numPal' label='Nombre palettes' input='number' inputCss='!h-14 rounded-md px-4' class='w-[45%]' value=${formattedNumPal} step="0.01"></sg-input>
+                    <sg-btn idname='validNumPal' css='bg-dblueBase text-white rounded-md w-full !h-14 text-xl font-semibold' class='w-[45%]'>Valider</sg-btn>
+                </div>                
+            </div>
+        `;
+
+        document.getElementById('modalContent').innerHTML = html;
+
+        document.getElementById('validNumPal').addEventListener('click', () => {
+            this.updateFac(facNbl);
+        });
+    }
+
+    updateFac(facNbl) {
+        const numPal = document.getElementById('numPal').value;
+        this.globalModel.updFacNumPal(facNbl, numPal)
+            .then(response => {
+                console.log("Success :", response);
+                document.getElementById('modal').classList.add('hidden');
+                document.getElementById('modalContent').innerHTML = '';
+                this.loadFacData(facNbl);
+            })
+            .catch(error => {
+                console.error("Error updating line:", error);
+            });
     }
 
     async getFac() {
@@ -221,6 +253,11 @@ export class HomePage extends HTMLElement {
                 </div>
                 <div class='pt-12 px-3 pb-3'>
                     <sg-table idname='tableCmd' css="table sgTableColor" class='bg-white h-full rounded-t-2xl'></sg-table> 
+                </div>
+
+                <div id='modal' class='p-24 hidden fixed top-0 left-0 right-0 z-50 w-full h-full bg-white'>
+                    <div id='closeModal' class='absolute top-12 right-12'><svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+                    <div id='modalContent' class='h-full'></div>
                 </div>
             </main>
         `;
