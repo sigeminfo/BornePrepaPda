@@ -47,11 +47,11 @@ export function moreDate() {
     }
 }
 
-export function impression(facNbl = 0, typeImp = "") {
+export function impression(facNbl = 0, typeImp = "", nbEx = 1) {
     const globalModel = new Global();
     const imgUrl = import.meta.env.VITE_IMG_URL;
 
-    return globalModel.impression(facNbl, typeImp)
+    return globalModel.impression(facNbl, typeImp, false, nbEx)
         .then(response => {
             console.log("Impression successful:", response);
             let printFrame = document.getElementById('impFrame');
@@ -65,4 +65,27 @@ export function impression(facNbl = 0, typeImp = "") {
             console.error("Error during impression:", error);
             throw error;
         });   
+}
+
+export function confirmImpressionBL(facNbl) { 
+    $.confirm({
+        title: 'Confirmation',
+        content: `<p>Voulez-vous imprimer le BL ?</p>`,
+        buttons: {
+            confirm: {
+                text: 'Oui',
+                btnClass: 'btn-confirm',
+                action: function () {
+                    impression(facNbl, 'BL', total);
+                }
+            },
+            cancel: {
+                text: 'Non',
+                btnClass: 'btn-cancel',
+                action: function () {
+                    console.log('Action cancelled');
+                }
+            }
+        }
+    });
 }

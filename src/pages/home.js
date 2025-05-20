@@ -139,7 +139,8 @@ export class HomePage extends HTMLElement {
         let htmlInput = "";
 
         palettes && palettes.forEach(pal => {
-           htmlInput += `<sg-input idname='numPal-${pal.pal_cod}' label='${pal.pal_lib}' input='number' inputCss='!h-14 rounded-md px-4' class='numPal w-[45%]' value="${pal.palBl_nb}" step="0.01"></sg-input>`;
+            console.log(pal);
+            htmlInput += `<sg-input idname='numPal-${pal.Pal_Cod}' label='${pal.pal_lib}' attr='` + JSON.stringify({lib: "data-pal-cod", value:`${pal.Pal_Cod}`}) + `' input='number' inputCss='!h-14 rounded-md px-4 numPal' class='w-[45%]' value="${pal.palBl_nb}" step="0.01"></sg-input>`; 
         });
         
         const html = `<div class='flex flex-col gap-10'>
@@ -157,22 +158,101 @@ export class HomePage extends HTMLElement {
                 this.updateFac(facNbl);
             });
         }, 200);        
-    }
+    }    
+
 
     updateFac(facNbl) {
         const numPals = [...document.getElementsByClassName('numPal')];
         const total = numPals.reduce((acc, cur) => acc + parseFloat(cur.value), 0);
-        this.globalModel.updFacNumPal(facNbl, numPal)
+
+        let jsonData = [];
+
+        numPals.forEach(pal => {
+            console.log(pal);
+            jsonData.push({
+                IOpalCod: pal.dataset.palCod,
+                IOnumPal: pal.value,
+                IOfacNbl: facNbl
+            });
+        });
+
+        this.globalModel.updFacNumPal(jsonData) 
         .then(response => {
             console.log("Success :", response);
             document.getElementById('modal').classList.add('hidden');
             document.getElementById('modalContent').innerHTML = '';
-            impression(facNbl, 'BL');
+            
+            $.confirm({
+                title: 'Confirmation',
+                content: `<p>Voulez-vous imprimer ${total} étiquettes ?</p>`,
+                buttons: {
+                    confirm: {
+                        text: 'Oui',
+                        btnClass: 'btn-confirm',
+                        action: function () {
+                            impression(facNbl, 'etiquettes', total);
+
+                            // a revoir mais marchait pas dans une fonction à part
+                            $.confirm({
+                                title: 'Confirmation',
+                                content: `<p>Voulez-vous imprimer le BL ?</p>`,
+                                buttons: {
+                                    confirm: {
+                                        text: 'Oui',
+                                        btnClass: 'btn-confirm',
+                                        action: function () {
+                                            impression(facNbl, 'BL', total);
+                                        }
+                                    },
+                                    cancel: {
+                                        text: 'Non',
+                                        btnClass: 'btn-cancel',
+                                        action: function () {
+                                            console.log('Action cancelled');
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    },
+                    cancel: {
+                        text: 'Non',
+                        btnClass: 'btn-cancel',
+                        action: function () {
+                            console.log('Action cancelled');
+
+                            $.confirm({
+                                title: 'Confirmation',
+                                content: `<p>Voulez-vous imprimer le BL ?</p>`,
+                                buttons: {
+                                    confirm: {
+                                        text: 'Oui',
+                                        btnClass: 'btn-confirm',
+                                        action: function () {
+                                            impression(facNbl, 'BL', total);
+                                        }
+                                    },
+                                    cancel: {
+                                        text: 'Non',
+                                        btnClass: 'btn-cancel',
+                                        action: function () {
+                                            console.log('Action cancelled');
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+            
+            
         })
         .catch(error => {
             console.error("Error updating line:", error);
         });
-    }
+    }    
+
 
     async getFac() {
         try {

@@ -137,13 +137,14 @@ export class Global {
         }
     }
 
-    async impression(facNbl, typeImp, append = false) {
+    async impression(facNbl, typeImp, append = false, nbEx = 1) {
         try {
             const data = {
                 "request": {
                     "IOjson": {
                         "IOfacNbl": facNbl,
-                        "IOappend": append
+                        "IOappend": append,
+                        "IOnbEx": nbEx
                     },
                     "IOquelPdf": typeImp
                 }
@@ -222,18 +223,21 @@ export class Global {
         }
     }
 
-    async updFacNumPal(facNbl, numPal) {
+    async updFacNumPal(data) {
         try {
-            const data = {
+            
+            const sendData = {
                 "request": {
                     "IOjson": {
-                        "IOfacNbl": `${facNbl}`,
-                        "IOnumPal": `${numPal}`
+                        "palettes": data
                     }
                 }
             };
+            
+            
             console.log(data);
-            const resp = await this.apiService.put(`${this.apiServiceSuffix}/setNumPal`, data );
+
+            const resp = await this.apiService.put(`${this.apiServiceSuffix}/setNumPal`, sendData);
             if (!resp?.response) {
                 throw new Error('Réponse invalide');
             }
