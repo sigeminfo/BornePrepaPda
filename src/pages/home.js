@@ -44,6 +44,12 @@ export class HomePage extends HTMLElement {
             this.toggleEntete();
             this.getFac();
         });
+
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('modal').classList.add('hidden');
+            document.getElementById('modalContent').innerHTML = '';
+        });
+
         document.getElementById('lessDateBtn').addEventListener('click', lessDate);
         document.getElementById('moreDateBtn').addEventListener('click', moreDate);
         document.getElementById('stateFiltre').addEventListener('change', (event) => {
@@ -102,8 +108,9 @@ export class HomePage extends HTMLElement {
             const row = printButton.closest('tr');
             if (row) {
                 const facNbl = row.getAttribute('data-id');
+                const palettes = row.getAttribute('data-palettes');
                 if (facNbl) {
-                    this.handleValidation(facNbl); // assignation nb palettes + impression
+                    this.handleValidation(facNbl, JSON.parse(palettes)); // assignation nb palettes + impression
                     //impression(facNbl, 'BL');
                 }
             }
@@ -128,15 +135,19 @@ export class HomePage extends HTMLElement {
         }
     }
 
-    handleValidation(facNbl) { 
-        let html = `
-            <div class='flex flex-col gap-10'>
-                <div class='flex w-full items-end gap-6'>                    
-                    <sg-input idname='numPal' label='Nombre palettes' input='number' inputCss='!h-14 rounded-md px-4' class='w-[45%]' value="" step="0.01"></sg-input>
-                    <sg-btn idname='validNumPal' css='bg-dblueBase text-white rounded-md w-full !h-14 text-xl font-semibold' class='w-[45%]'>Valider</sg-btn>
-                </div>                
-            </div>
-        `;
+    handleValidation(facNbl, palettes) {         
+        let htmlInput = "";
+
+        palettes && palettes.forEach(pal => {
+           htmlInput += `<sg-input idname='numPal-${pal.pal_cod}' label='${pal.pal_lib}' input='number' inputCss='!h-14 rounded-md px-4' class='numPal w-[45%]' value="${pal.palBl_nb}" step="0.01"></sg-input>`;
+        });
+        
+        const html = `<div class='flex flex-col gap-10'>
+                        <div class='flex w-full items-end gap-6'>                    
+                            ${htmlInput}
+                            <sg-btn idname='validNumPal' css='bg-dblueBase text-white rounded-md w-full !h-14 text-xl font-semibold' class='w-[45%]'>Valider</sg-btn>
+                        </div>                
+                    </div>`;
 
         document.getElementById('modal').classList.remove('hidden');
         document.getElementById('modalContent').innerHTML = html;
@@ -149,7 +160,8 @@ export class HomePage extends HTMLElement {
     }
 
     updateFac(facNbl) {
-        const numPal = document.getElementById('numPal').value;
+        const numPals = [...document.getElementsByClassName('numPal')];
+        const total = numPals.reduce((acc, cur) => acc + parseFloat(cur.value), 0);
         this.globalModel.updFacNumPal(facNbl, numPal)
         .then(response => {
             console.log("Success :", response);
@@ -208,6 +220,7 @@ export class HomePage extends HTMLElement {
 
                     return {
                         id: val.fac_nbl,
+                        attr: { "data-palettes": val.palettes && val.palettes.length ? JSON.stringify(val.palettes) : "" },
                         css: rowClass,
                         trData: [
                             { tdData: new Date(val.datebl).toLocaleDateString('fr-FR', options), css: 'date', type: '' },
@@ -216,7 +229,7 @@ export class HomePage extends HTMLElement {
                             { tdData: val.fac_coin, css: 'commentaire' },
                             { tdData: val.nbCdePrep + ' / ' + val.nbLig, css: 'lignes text-right', type: '' },
                             { tdData: val.tou_nom, css: 'tournee', type: '' },
-                            { tdData: button.outerHTML, css: '', type: 'button' },
+                            { tdData: button.outerHTML, css: '', type: 'button' }, 
                         ]
                     }
                 })

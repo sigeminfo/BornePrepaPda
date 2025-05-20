@@ -69,8 +69,11 @@ export default class Table extends CustomElement {
                 let tdCss = cell.css || '';
                 tdCss = tdCss.includes('number') ? tdCss.replace('number', 'text-right') : tdCss;
                 td.className = `px-3.5 py-2 ${tdCss}`;
+                console.log("attrname");
+                console.log(cell.attr);
+                        
                 if (cell.attr && typeof cell.attr === 'object') {
-                    Object.keys(cell.attr).forEach(attrName => {
+                    Object.keys(cell.attr).forEach(attrName => {                        
                         td.setAttribute(attrName, cell.attr[attrName]);
                     });
                 }
