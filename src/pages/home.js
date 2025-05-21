@@ -163,7 +163,7 @@ export class HomePage extends HTMLElement {
 
     updateFac(facNbl) {
         const numPals = [...document.getElementsByClassName('numPal')];
-        const total = numPals.reduce((acc, cur) => acc + parseFloat(cur.value), 0);
+        const nbEx = numPals.reduce((acc, cur) => acc + parseFloat(cur.value), 0);
 
         let jsonData = [];
 
@@ -184,13 +184,13 @@ export class HomePage extends HTMLElement {
             
             $.confirm({
                 title: 'Confirmation',
-                content: `<p>Voulez-vous imprimer ${total} étiquettes ?</p>`,
+                content: `<p>Voulez-vous imprimer ${nbEx} étiquettes ?</p>`,
                 buttons: {
                     confirm: {
                         text: 'Oui',
                         btnClass: 'btn-confirm',
                         action: function () {
-                            impression(facNbl, 'etiquettes', total);
+                            impression(facNbl, 'etiquettes', nbEx);
 
                             // a revoir mais marchait pas dans une fonction à part
                             $.confirm({
@@ -201,7 +201,7 @@ export class HomePage extends HTMLElement {
                                         text: 'Oui',
                                         btnClass: 'btn-confirm',
                                         action: function () {
-                                            impression(facNbl, 'BL', total);
+                                            impression(facNbl, 'BL', 1);
                                         }
                                     },
                                     cancel: {
@@ -229,7 +229,7 @@ export class HomePage extends HTMLElement {
                                         text: 'Oui',
                                         btnClass: 'btn-confirm',
                                         action: function () {
-                                            impression(facNbl, 'BL', total);
+                                            impression(facNbl, 'BL', 1);
                                         }
                                     },
                                     cancel: {

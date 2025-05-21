@@ -54,11 +54,13 @@ export function impression(facNbl = 0, typeImp = "", nbEx = 1) {
     return globalModel.impression(facNbl, typeImp, false, nbEx)
         .then(response => {
             console.log("Impression successful:", response);
+            /*
             let printFrame = document.getElementById('impFrame');
             console.log(printFrame);
             printFrame.src = imgUrl + response.IOurl;
             printFrame.style.display = 'block';
             printFrame.contentWindow.focus();
+            */
             return response;
         })
         .catch(error => {
