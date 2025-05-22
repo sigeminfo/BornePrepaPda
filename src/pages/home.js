@@ -276,8 +276,34 @@ export class HomePage extends HTMLElement {
         button.setAttribute('css', 'bg-dblueBase p-2 text-white rounded flex items-center prepaImpBl');
         button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>';
         let options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+
+        // ********** Etats
+        let stateB = document.createElement('div');
+        stateB.className = 'bg-lblueBase/20 rounded-full flex items-center justify-center w-[35px] h-[35px]';
+        let sousStateB = document.createElement('div');
+        sousStateB.className = 'bg-lblueBase rounded-full w-[25px] h-[25px]';
+        stateB.appendChild(sousStateB);
+
+        let btnsStateB = document.createElement('div');
+        let btnsStateO = document.createElement('div');
+        btnsStateO.dataset.manquant = true;
+        let btnsStateNull = document.createElement('div');
+        
+        btnsStateO.className = 'flex items-center gap-1.5';
+        btnsStateB.className = 'flex items-center gap-1.5';
+        btnsStateNull.className = 'flex items-center gap-1.5';
+
+        let stateO = document.createElement('div');
+        stateO.className = 'bg-orangeBase/20 rounded-full flex items-center justify-center w-[35px] h-[35px]';
+        let sousStateO = document.createElement('div');
+        sousStateO.className = 'bg-orangeBase rounded-full w-[25px] h-[25px]';
+        stateO.appendChild(sousStateO);
+
+        let stateNull = '';
+        
         return {
             thead: [
+                { lib: 'Etat'},
                 { lib: 'Date'},
                 { lib: 'N°', css: 'text-right' },
                 { lib: 'Client'},
@@ -303,6 +329,7 @@ export class HomePage extends HTMLElement {
                         attr: { "data-palettes": val.palettes && val.palettes.length ? JSON.stringify(val.palettes) : "" },
                         css: rowClass,
                         trData: [
+                            { tdData: (val.fac_kat == "C" ? stateB.outerHTML : (val.isManquant ? stateO.outerHTML : stateNull)), css: 'etat', type: '' },
                             { tdData: new Date(val.datebl).toLocaleDateString('fr-FR', options), css: 'date', type: '' },
                             { tdData: val.fac_nbl, css: 'commande text-right', type: '' },
                             { tdData: val.cli_nom, css: 'client', type: '' },

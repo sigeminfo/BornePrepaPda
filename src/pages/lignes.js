@@ -227,8 +227,14 @@ export class LignesPage extends HTMLElement {
         let tbody = []
 
         let rowIndex = 0;
+
+        const ordre = {
+            'C':1,
+            'P':2,
+            'K':3
+        }
     
-        this.lignes.forEach(ligne => {
+        this.lignes.sort((a, b) => ordre[a.Lf_typ] - ordre[b.Lf_typ]).forEach(ligne => {
             console.log(ligne);
             // Main row with article data
             const bgColorClass = rowIndex % 4 < 2 ? '!bg-white' : '!bg-dblueLight';
@@ -239,7 +245,7 @@ export class LignesPage extends HTMLElement {
                 attr: { 'data-ligne': JSON.stringify(ligne) },
                 trData: [
                     { tdData: (ligne.Lf_prev != "" ? stateB.outerHTML : (ligne.Art_cod == '*' ? stateO.outerHTML : stateNull)), css: 'etat', type: '' },
-                    { tdData: ligne.Lot_cod, css: 'lot text-right', type: '' },
+                    { tdData: ligne.Lot_cod, css: 'lot text-right' + (ligne.Lfl_lig == 0 ? ' text-red-500' : ''), type: '' },
                     { tdData: (ligne.Lf_typ == 'K' ? (ligne.Lf_poin ? (Math.ceil(parseFloat(ligne.Lf_poin) * 100) / 100).toFixed(1) : '0.0') : (ligne.Lf_typ == 'P' ? ligne.Lf_pito : ligne.Lf_col)), css: 'quantite text-right', type: '' },
                     { tdData: ligne.Lf_typ, css: 'unite', type: '' },
                     { tdData: ligne.Art_cod, css: 'artcod', type: '' },
@@ -330,7 +336,7 @@ export class LignesPage extends HTMLElement {
         document.getElementById('modalContent').innerHTML = '';
 
         const roundedPoidsNet = detail.Lf_poin ? Math.ceil(parseFloat(detail.Lf_poin) * 100) / 100 : 0;
-        const formattedPoidsNet = roundedPoidsNet.toFixed(2);
+        const formattedPoidsNet = roundedPoidsNet.toFixed(1);
 
         const html = `
             <div class='flex flex-col gap-10'>
@@ -339,7 +345,8 @@ export class LignesPage extends HTMLElement {
                         <sg-input idname='colis' label='Colis' input='text' inputCss='!rounded-l-md !h-14 px-4' class='grow' value=${detail.Lf_col}></sg-input>
                         <sg-btn idname='moinsCol' css='bg-dblueBase text-white rounded-r-md w-14 !h-14 flex items-center justify-center'>-</sg-btn>
                     </div>
-                    <sg-input idname='poidsnet' label='Poids Net' input='number' inputCss='!h-14 rounded-md px-4' class='w-[45%]' value=${formattedPoidsNet} step="0.01"></sg-input>
+                    <sg-input idname='poidsnet' label='Poids Net' input='number' inputCss='!h-14 rounded-md px-4' class='w-[45%] ${detail.Lf_typ == 'P' ? 'hidden' : ''}' value=${formattedPoidsNet} step="0.01"></sg-input>
+                    <sg-input idname='pieces' label='Pièces Totales' input='number' inputCss='!h-14 rounded-md px-4' class='w-[45%] ${detail.Lf_typ == 'K' || detail.Lf_typ == 'C' ? 'hidden' : ''}' value=${detail.Lf_pito} step="1"></sg-input>
                 </div>
 
                 <!--<div class='flex w-full gap-6'>
@@ -373,6 +380,7 @@ export class LignesPage extends HTMLElement {
 
     updateFacLig(detail) {
         const colis = document.getElementById('colis').value;
+        const pieces = document.getElementById('pieces').value;
         //const tare = document.getElementById('tare').value;
         //const tarep = document.getElementById('tarep').value;
         //const poidsbrut = document.getElementById('poidsbrut').value;
@@ -382,6 +390,7 @@ export class LignesPage extends HTMLElement {
         /*detail.Lf_tar = tare;
         detail.Lf_tarp = tarep;
         detail.Lf_poib = poidsbrut;*/
+        detail.Lf_pito = pieces;
         detail.Lf_poin = poidsnet;
         detail.Lf_tagc = sessionStorage.getItem('client');
 
